@@ -66,7 +66,7 @@ sonarqube {
 	properties {
 		property 'sonar.projectName', 'retail-store'
 		property 'sonar.host.url', 'http://localhost:9000'
-		property 'sonar.token', 'squ_bb49eeea31fdc04808e4bc2a4e0d2231ad9a9bd5'
+		property 'sonar.token', 'sonar.token'
 		property 'sonar.java.coveragePlugin', 'jacoco'
 		property 'sonar.junit.reportPaths', 'build/test-results/test'
 		property 'sonar.jacoco.reportPaths', 'build/jacoco/test.exec'
