@@ -1,12 +1,12 @@
 package com.example.retailstore.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor
 public class AffiliateCustomer extends BaseEntity {
     private String name;

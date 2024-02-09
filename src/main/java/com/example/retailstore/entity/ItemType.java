@@ -1,12 +1,12 @@
 package com.example.retailstore.entity;
 
 import jakarta.persistence.Entity;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
 @NoArgsConstructor
+@Getter
 public class ItemType extends BaseEntity {
     private String code;
     private String description;

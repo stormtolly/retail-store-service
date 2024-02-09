@@ -1,14 +1,14 @@
 package com.example.retailstore.entity;
 
 import jakarta.persistence.Entity;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Entity
-@Data
 @NoArgsConstructor
+@Getter
 public class Discount extends BaseEntity {
     private String code;
     private String description;
