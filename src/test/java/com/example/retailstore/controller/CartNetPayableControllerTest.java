@@ -40,10 +40,10 @@ class CartNetPayableControllerTest {
     @Test
     void findCardNetPayableTest_Success(){
         Order order = new Order(4L, new HashSet<>(Arrays.asList(
-                new PurchaseItem(1, "Mobile", "ELECTRONICS", 1, new BigDecimal(1000)),
-                new PurchaseItem(2, "Oil", "GROCERY", 1, new BigDecimal(90))
+                new PurchaseItem(1, "Mobile", "ELECTRONICS", 1, BigDecimal.valueOf(1000)),
+                new PurchaseItem(2, "Oil", "GROCERY", 1, BigDecimal.valueOf(90))
         )));
-        DiscountResponse mockResponse = new DiscountResponse(new BigDecimal(1090), new BigDecimal(1040));
+        DiscountResponse mockResponse = new DiscountResponse(BigDecimal.valueOf(1090), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.valueOf(50), BigDecimal.valueOf(1040));
         when(discountService.calculateNetPayable(order)).thenReturn(mockResponse);
         DiscountResponse netPayable = cartNetPayableController.calculateNetPayable(order);
         assertEquals(mockResponse.totalOrderAmount(), netPayable.totalOrderAmount());
@@ -53,8 +53,8 @@ class CartNetPayableControllerTest {
     @Test
     void findCardNetPayableTest_Success_Ok() throws Exception {
         Order order = new Order(4L, new HashSet<>(Arrays.asList(
-                new PurchaseItem(1, "Mobile", "ELECTRONICS", 1, new BigDecimal(1000)),
-                new PurchaseItem(2, "Oil", "GROCERY", 1, new BigDecimal(90))
+                new PurchaseItem(1, "Mobile", "ELECTRONICS", 1, BigDecimal.valueOf(1000)),
+                new PurchaseItem(2, "Oil", "GROCERY", 1, BigDecimal.valueOf(90))
         )));
 
         mvc = MockMvcBuilders.standaloneSetup(cartNetPayableController)
@@ -68,8 +68,8 @@ class CartNetPayableControllerTest {
     @Test
     void givenCustomerIdNull_FindCardNetPayableTest_Failed_BadRequest() throws Exception {
         Order order = new Order(null, new HashSet<>(Arrays.asList(
-                new PurchaseItem(1, "Mobile", "ELECTRONICS", 1, new BigDecimal(1000)),
-                new PurchaseItem(2, "Oil", "GROCERY", 1, new BigDecimal(90))
+                new PurchaseItem(1, "Mobile", "ELECTRONICS", 1, BigDecimal.valueOf(1000)),
+                new PurchaseItem(2, "Oil", "GROCERY", 1, BigDecimal.valueOf(90))
         )));
         String errorResponse = """
                 {"validationErrors":[{"errorMessage":"Customer ID cannot be null","target":"customerId"}],"error":"Validation Failed"}""";

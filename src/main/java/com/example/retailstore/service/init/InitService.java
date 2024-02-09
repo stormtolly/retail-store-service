@@ -34,9 +34,9 @@ public class InitService {
     @PostConstruct
     public void init(){
         log.info("Initiating the data...");
-        discountRepository.saveAll(Arrays.asList(new Discount(1L, "EMP", "Employee discount", new BigDecimal(30)),
-                new Discount(2L, "AFF", "Affiliate discount", new BigDecimal(10)),
-                new Discount(3L, "LTC", "Long term customer discount", new BigDecimal(5))));
+        discountRepository.saveAll(Arrays.asList(new Discount(1L, "EMP", "Employee discount", BigDecimal.valueOf(30)),
+                new Discount(2L, "AFF", "Affiliate discount", BigDecimal.valueOf(10)),
+                new Discount(3L, "LTC", "Long term customer discount", BigDecimal.valueOf(5))));
         itemTypeRepository.saveAll(Arrays.asList(new ItemType(1L, "ELECTRONICS", "Electronic items", true),
                 new ItemType(2L, "GROCERY", "Grocery items", false),
                 new ItemType(3L, "TOYS", "Baby toys", true),

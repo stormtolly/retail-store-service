@@ -37,12 +37,12 @@ class DiscountServiceTest {
     @InjectMocks
     DiscountServiceImpl discountService;
 
-    Discount discountForEmp = new Discount(1L, "EMP", "Employee discount", new BigDecimal(30));
-    Discount discountForAffUser = new Discount(2L, "AFF", "Affiliate discount", new BigDecimal(10));
-    Discount discountForLongTermUser = new Discount(3L, "LTC", "Long term customer discount", new BigDecimal(5));
+    Discount discountForEmp = new Discount(1L, "EMP", "Employee discount", BigDecimal.valueOf(30));
+    Discount discountForAffUser = new Discount(2L, "AFF", "Affiliate discount", BigDecimal.valueOf(10));
+    Discount discountForLongTermUser = new Discount(3L, "LTC", "Long term customer discount", BigDecimal.valueOf(5));
     Order order = new Order(4L, new HashSet<>(Arrays.asList(
-            new PurchaseItem(1L, "Mobile", "ELECTRONICS", 1, new BigDecimal(1000)),
-            new PurchaseItem(2L, "Oil", "GROCERY", 1, new BigDecimal(90))
+            new PurchaseItem(1L, "Mobile", "ELECTRONICS", 1, BigDecimal.valueOf(1000)),
+            new PurchaseItem(2L, "Oil", "GROCERY", 1, BigDecimal.valueOf(90))
     )));
     List<ItemType> itemTypeList = Arrays.asList(new ItemType(1L, "ELECTRONICS", "Electronic items", true),
             new ItemType(2L, "GROCERY", "Grocery items", false),
@@ -58,6 +58,9 @@ class DiscountServiceTest {
         when(customerService.findCustomerById(anyLong())).thenReturn(newCustomer);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(1090), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.ZERO, discountResponse.discountPercentage());
+        assertEquals(BigDecimal.ZERO, discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.valueOf(50), discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(1040), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
     }
@@ -71,6 +74,9 @@ class DiscountServiceTest {
         when(itemTypeService.findAll()).thenReturn(itemTypeList);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(1090), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.valueOf(5), discountResponse.discountPercentage());
+        assertEquals(BigDecimal.valueOf(50), discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.valueOf(50), discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(990), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
         verify(discountRepository, times(1)).findByCode(ServiceConstants.LONG_TERM_CUSTOMER_DISCOUNT_CODE);
@@ -87,6 +93,9 @@ class DiscountServiceTest {
         when(itemTypeService.findAll()).thenReturn(itemTypeList);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(1090), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.valueOf(10), discountResponse.discountPercentage());
+        assertEquals(BigDecimal.valueOf(100), discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.valueOf(45), discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(945), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
         verify(discountRepository, times(1)).findByCode(ServiceConstants.AFFILIATE_DISCOUNT_CODE);
@@ -103,6 +112,9 @@ class DiscountServiceTest {
         when(itemTypeService.findAll()).thenReturn(itemTypeList);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(1090), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.valueOf(30), discountResponse.discountPercentage());
+        assertEquals(BigDecimal.valueOf(300), discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.valueOf(35), discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(755), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
         verify(discountRepository, times(1)).findByCode(ServiceConstants.EMPLOYEE_DISCOUNT_CODE);
@@ -110,19 +122,22 @@ class DiscountServiceTest {
     }
 
     @Test
-    void GivenUserIsEmployeeOnlyGroceries_CalculateNetPayable_EmployeeDiscountAndFixedDiscountApplies(){
+    void GivenUserIsEmployeeOnlyGroceries_CalculateNetPayable_OnlyFixedDiscountApplies(){
         Customer newCustomer = new Customer(1L, "Surya", "Kumar", "surya@gmail.com", true,
                 LocalDate.now().minusYears(1),
                 null);
-        Order order = new Order(4L, new HashSet<>(Arrays.asList(
-                new PurchaseItem(1, "Sugar", "GROCERY", 1, new BigDecimal(50)),
-                new PurchaseItem(2, "Oil", "GROCERY", 1, new BigDecimal(90))
+        Order order = new Order(1L, new HashSet<>(Arrays.asList(
+                new PurchaseItem(1, "Sugar", "GROCERY", 1, BigDecimal.valueOf(50)),
+                new PurchaseItem(2, "Oil", "GROCERY", 1, BigDecimal.valueOf(90))
         )));
         when(customerService.findCustomerById(anyLong())).thenReturn(newCustomer);
         when(discountRepository.findByCode(ServiceConstants.EMPLOYEE_DISCOUNT_CODE)).thenReturn(discountForEmp);
         when(itemTypeService.findAll()).thenReturn(itemTypeList);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(140), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.valueOf(30), discountResponse.discountPercentage());
+        assertEquals(BigDecimal.ZERO, discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.valueOf(5), discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(135), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
         verify(discountRepository, times(1)).findByCode(ServiceConstants.EMPLOYEE_DISCOUNT_CODE);
@@ -140,6 +155,9 @@ class DiscountServiceTest {
         when(itemTypeService.findAll()).thenReturn(itemTypeList);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(1090), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.valueOf(30), discountResponse.discountPercentage());
+        assertEquals(BigDecimal.valueOf(300), discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.valueOf(35), discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(755), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
         verify(discountRepository, times(1)).findByCode(ServiceConstants.AFFILIATE_DISCOUNT_CODE);
@@ -153,13 +171,16 @@ class DiscountServiceTest {
                 LocalDate.now().minusYears(1),
                 null);
         Order order = new Order(4L, new HashSet<>(List.of(
-                new PurchaseItem(1, "Ball", "TOYS", 1, new BigDecimal(50))
+                new PurchaseItem(1, "Ball", "TOYS", 1, BigDecimal.valueOf(50))
         )));
         when(customerService.findCustomerById(anyLong())).thenReturn(newCustomer);
         when(discountRepository.findByCode(ServiceConstants.EMPLOYEE_DISCOUNT_CODE)).thenReturn(discountForEmp);
         when(itemTypeService.findAll()).thenReturn(itemTypeList);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(50), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.valueOf(30), discountResponse.discountPercentage());
+        assertEquals(BigDecimal.valueOf(15), discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.ZERO, discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(35), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
         verify(discountRepository, times(1)).findByCode(ServiceConstants.EMPLOYEE_DISCOUNT_CODE);
@@ -172,13 +193,16 @@ class DiscountServiceTest {
                 LocalDate.now().minusYears(1),
                 null);
         Order order = new Order(4L, new HashSet<>(List.of(
-                new PurchaseItem(1, "Sugar", "GROCERY", 1, new BigDecimal(50))
+                new PurchaseItem(1, "Sugar", "GROCERY", 1, BigDecimal.valueOf(50))
         )));
         when(customerService.findCustomerById(anyLong())).thenReturn(newCustomer);
         when(discountRepository.findByCode(ServiceConstants.EMPLOYEE_DISCOUNT_CODE)).thenReturn(discountForEmp);
         when(itemTypeService.findAll()).thenReturn(itemTypeList);
         DiscountResponse discountResponse = discountService.calculateNetPayable(order);
         assertEquals(BigDecimal.valueOf(50), discountResponse.totalOrderAmount());
+        assertEquals(BigDecimal.valueOf(30), discountResponse.discountPercentage());
+        assertEquals(BigDecimal.ZERO, discountResponse.discountPercentageAmount());
+        assertEquals(BigDecimal.ZERO, discountResponse.fixedDiscountAmount());
         assertEquals(BigDecimal.valueOf(50), discountResponse.netPayable());
         verify(customerService, times(1)).findCustomerById(anyLong());
         verify(discountRepository, times(1)).findByCode(ServiceConstants.EMPLOYEE_DISCOUNT_CODE);

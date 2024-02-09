@@ -52,7 +52,8 @@ public class DiscountServiceImpl implements DiscountService {
         log.debug("Fixed discount amount for order {}: {}", order.customerId(), fixedDiscountAmount);
         BigDecimal netPayable = totalAfterPercentageDiscount.subtract(fixedDiscountAmount);
         log.debug("Net payable amount for order {}: {}", order.customerId(), netPayable);
-        return new DiscountResponse(totalOrderAmount, netPayable);
+        return new DiscountResponse(totalOrderAmount, discountPercentage, percentageDiscountAmount,
+                fixedDiscountAmount, netPayable);
     }
 
     /**
