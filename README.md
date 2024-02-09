@@ -44,6 +44,6 @@ Run the below command to start the application
 Once the application is started, swagger API documentation is available at http://localhost:8080/swagger-ui/index.html
 
 # Project UML Diagram :
-![img.png](retailstore-uml.png)
+![img.png](retailstore_uml.png)
 # Sonar Report :
 ![img.png](sonarqube_coverage.png)
