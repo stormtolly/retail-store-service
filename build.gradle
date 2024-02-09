@@ -1,0 +1,78 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.sonarqube' version '4.4.1.3373'
+	id 'jacoco'
+}
+
+//group = 'com.example'
+//version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+	testImplementation 'org.mockito:mockito-core:5.10.0'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = "0.8.11"
+	reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+test {
+	jacoco {
+		excludes = ["com/example/retailstore/dto/**",
+					"com/example/retailstore/entity/**",
+					"com/example/retailstore/service/init/**",
+					"com/example/retailstore/RetailStoreApplication.java"]
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+}
+
+sonarqube {
+	properties {
+		property 'sonar.projectName', 'retail-store'
+		property 'sonar.host.url', 'http://localhost:9000'
+		property 'sonar.token', 'squ_bb49eeea31fdc04808e4bc2a4e0d2231ad9a9bd5'
+		property 'sonar.java.coveragePlugin', 'jacoco'
+		property 'sonar.junit.reportPaths', 'build/test-results/test'
+		property 'sonar.jacoco.reportPaths', 'build/jacoco/test.exec'
+		property "sonar.coverage.exclusions", "**/com/example/retailstore/dto/**," +
+				"**/com/example/retailstore/entity/**," +
+				"**/com/example/retailstore/service/init/**," +
+				"**/com/example/retailstore/RetailStoreApplication.java"
+	}
+}
